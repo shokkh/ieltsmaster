@@ -40,10 +40,10 @@
                     </div>
                 </li>
                 <li class="mobile-profile-item">
-                    <div class="mobile-profile">
-                        <span class="avatar-small">S</span>
+                    <button class="mobile-profile" type="button" aria-label="Open profile" onclick="showPage('profile')">
+                        <span class="avatar-small" data-profile-initial aria-hidden="true">S</span>
                         <span>Profile</span>
-                    </div>
+                    </button>
                 </li>
             </ul>
             <button type="button" class="hamburger" onclick="toggleMenu()" aria-label="Open menu" aria-controls="navLinks" aria-expanded="false">
@@ -56,8 +56,48 @@
 
     <header class="workspace-header">
         <div><span>Workspace</span><i class="fas fa-chevron-right"></i><strong id="activePageTitle">Overview</strong></div>
-        <div class="header-right"><span class="avatar-small">S</span></div>
+        <div class="header-right">
+            <button class="profile-trigger" type="button" aria-label="Open profile" onclick="showPage('profile')">
+                <span class="avatar-small" data-profile-initial aria-hidden="true">S</span>
+            </button>
+        </div>
     </header>
+
+    <dialog class="onboarding-dialog" id="onboardingDialog" aria-labelledby="onboardingTitle">
+        <p class="onboarding-eyebrow">IELTS MASTER</p>
+        <h2 id="onboardingTitle">Let’s set up your study profile</h2>
+        <p>Enter your name and target band score to personalize your practice space.</p>
+        <form class="onboarding-form" id="onboardingForm">
+            <div class="profile-name-field">
+                <label for="onboardingNameInput">Your name</label>
+                <input id="onboardingNameInput" name="name" type="text" maxlength="40" autocomplete="name" required>
+            </div>
+            <div class="profile-name-field">
+                <label for="onboardingTargetBand">Target band score</label>
+                <select id="onboardingTargetBand" name="targetBand" required>
+                    <option value="1.0">1.0</option>
+                    <option value="1.5">1.5</option>
+                    <option value="2.0">2.0</option>
+                    <option value="2.5">2.5</option>
+                    <option value="3.0">3.0</option>
+                    <option value="3.5">3.5</option>
+                    <option value="4.0">4.0</option>
+                    <option value="4.5">4.5</option>
+                    <option value="5.0">5.0</option>
+                    <option value="5.5">5.5</option>
+                    <option value="6.0">6.0</option>
+                    <option value="6.5">6.5</option>
+                    <option value="7.0">7.0</option>
+                    <option value="7.5" selected>7.5</option>
+                    <option value="8.0">8.0</option>
+                    <option value="8.5">8.5</option>
+                    <option value="9.0">9.0</option>
+                </select>
+            </div>
+            <button class="lime-button" type="submit">Start learning<i class="fas fa-arrow-right" aria-hidden="true"></i></button>
+            <p class="profile-status" id="onboardingStatus" role="status" aria-live="polite" hidden></p>
+        </form>
+    </dialog>
 
     <!-- Dashboard Page -->
     <div id="dashboard" class="page active">
@@ -93,8 +133,8 @@
                 <section class="goal-panel">
                     <div class="goal-top"><span class="icon-tile"><i class="fas fa-bullseye"></i></span><span class="goal-label">Your target</span></div>
                     <h3>Target band score</h3>
-                    <div class="target-number">7.5<span>/ 9</span></div>
-                    <div class="goal-scale"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+                    <div class="target-number" id="targetBandDisplay">7.5<span>/ 9</span></div>
+                    <div class="goal-scale" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
                     <p>A clear goal. A fresh start. Complete a practice session to start tracking your progress.</p>
                     <div class="goal-footer"><i class="fas fa-shield-alt"></i><span>Your progress stays on this device.</span></div>
                 </section>
@@ -377,6 +417,72 @@
                 </article>
             </div>
             <p class="podcast-note">Audio and episode pages are provided by their publishers and open in a new tab.</p>
+        </div>
+    </div>
+
+    <!-- Profile Page -->
+    <div id="profile" class="page">
+        <div class="container">
+            <div class="section-header">
+                <div>
+                    <h1 class="section-title">Your Profile</h1>
+                    <p class="section-subtitle">A quick look at your IELTS practice on this device.</p>
+                </div>
+            </div>
+
+            <section class="profile-overview-card" aria-label="Study profile">
+                <span class="profile-avatar-large" data-profile-initial aria-hidden="true">S</span>
+                <div>
+                    <h2 id="profileDisplayName" data-profile-name>Student</h2>
+                    <p><i class="fas fa-graduation-cap" aria-hidden="true"></i> IELTS Academic · Local profile</p>
+                </div>
+            </section>
+
+            <form class="profile-settings-form" id="profileSettingsForm">
+                <div class="profile-name-field">
+                    <label for="profileNameInput">Your name</label>
+                    <input id="profileNameInput" name="name" type="text" maxlength="40" autocomplete="name" required>
+                </div>
+                <div class="profile-name-field">
+                    <label for="profileTargetBand">Target band score</label>
+                    <select id="profileTargetBand" name="targetBand" required>
+                        <option value="1.0">1.0</option>
+                        <option value="1.5">1.5</option>
+                        <option value="2.0">2.0</option>
+                        <option value="2.5">2.5</option>
+                        <option value="3.0">3.0</option>
+                        <option value="3.5">3.5</option>
+                        <option value="4.0">4.0</option>
+                        <option value="4.5">4.5</option>
+                        <option value="5.0">5.0</option>
+                        <option value="5.5">5.5</option>
+                        <option value="6.0">6.0</option>
+                        <option value="6.5">6.5</option>
+                        <option value="7.0">7.0</option>
+                        <option value="7.5" selected>7.5</option>
+                        <option value="8.0">8.0</option>
+                        <option value="8.5">8.5</option>
+                        <option value="9.0">9.0</option>
+                    </select>
+                </div>
+                <button class="btn btn-primary" type="submit">Save profile</button>
+                <p class="profile-status" id="profileSaveStatus" role="status" aria-live="polite" hidden></p>
+            </form>
+            <p class="profile-stat-label">Current target: <strong id="profileTargetBandDisplay">7.5</strong></p>
+
+            <div class="profile-stats-grid">
+                <article class="card profile-stat-card">
+                    <span class="profile-stat-label">Unique mock papers completed</span>
+                    <strong id="profileCompletedCount">0</strong>
+                </article>
+                <article class="card profile-stat-card">
+                    <span class="profile-stat-label">Active study days</span>
+                    <strong id="profileActiveDayCount">0</strong>
+                </article>
+            </div>
+
+            <p class="profile-note">Practice progress is saved locally in this browser. No account or sign-in is connected.</p>
+            <button class="lime-button" type="button" onclick="showPage('dashboard')">Back to Overview<i class="fas fa-arrow-left"></i></button>
         </div>
     </div>
 

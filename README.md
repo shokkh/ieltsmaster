@@ -14,6 +14,10 @@ IELTS Master is a static IELTS study site. Run `node serve.js` from the project 
 
 The mock library is practice material, not official IELTS content. Speaking and Writing are not automatically band-scored. Progress is stored in this browser; audio recordings are temporary and are not saved after leaving the page.
 
+## Profile
+
+On the first visit, a setup dialog asks for a name and target band score. The header avatar and mobile-menu Profile button open a local study summary with completed mock and active-day counts; name and target band can be changed there and are saved in this browser.
+
 ## English Podcasts
 
 The English Podcasts page links to the ENGLISH PODCASTS Telegram channel, BBC Learning English, and VOA Learning English. Channel episodes and publisher audio open at their original sources; this project does not copy or host those recordings.

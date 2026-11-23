@@ -1,6 +1,8 @@
 const mockProgressStorageKey = 'ielts-master-mock-progress';
 const mockActivityStorageKey = 'ielts-master-mock-active-days';
+const profileStorageKey = 'ielts-master-profile';
 const mockProgressSkills = ['listening', 'reading', 'writing', 'speaking'];
+let activeProfile = { name: 'Student', targetBand: 7.5, onboardingComplete: false };
 
 function showSkillProgressError(message, error) {
     console.error(message, error);
@@ -84,6 +86,8 @@ function renderSkillProgress() {
 
     const overallCount = document.getElementById('completedMockCount');
     if (overallCount) overallCount.textContent = String(totalCompleted);
+    const profileCount = document.getElementById('profileCompletedCount');
+    if (profileCount) profileCount.textContent = String(totalCompleted);
 }
 
 function localDateKey(date) {
@@ -137,6 +141,8 @@ function renderRecentMockActivity(days) {
     list.replaceChildren();
 
     const recentDays = days.filter(day => day <= localDateKey(new Date())).slice(-4).reverse();
+    const activeDayCount = document.getElementById('profileActiveDayCount');
+    if (activeDayCount) activeDayCount.textContent = String(days.filter(day => day <= localDateKey(new Date())).length);
     if (recentDays.length === 0) {
         const empty = document.createElement('p');
         empty.className = 'activity-empty';
@@ -154,6 +160,162 @@ function renderRecentMockActivity(days) {
         item.querySelector('.activity-meta').textContent = `Active day · ${itemDate.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}`;
         list.append(item);
     });
+}
+
+function showProfileStatus(message, isError, statusId) {
+    const status = document.getElementById(statusId);
+    status.textContent = message;
+    status.classList.toggle('error', isError);
+    status.hidden = false;
+}
+
+function showProfileError(message, error, statusId) {
+    console.error(message, error);
+    showProfileStatus('Profile details could not be loaded or saved in this browser.', true, statusId);
+}
+
+function isValidTargetBand(targetBand) {
+    return typeof targetBand === 'number' &&
+        Number.isFinite(targetBand) &&
+        targetBand >= 1 &&
+        targetBand <= 9 &&
+        Number.isInteger(targetBand * 2);
+}
+
+function applyProfile(profile) {
+    activeProfile = profile;
+    const name = profile.name;
+    const targetBand = profile.targetBand.toFixed(1);
+    const initial = Array.from(name)[0].toUpperCase();
+    document.querySelectorAll('[data-profile-initial]').forEach(element => {
+        element.textContent = initial;
+    });
+    document.querySelectorAll('[data-profile-name]').forEach(element => {
+        element.textContent = name;
+    });
+    document.querySelectorAll('.profile-trigger, .mobile-profile').forEach(button => {
+        button.setAttribute('aria-label', `Open profile for ${name}`);
+    });
+    document.getElementById('profileNameInput').value = name;
+    document.getElementById('onboardingNameInput').value = name;
+    document.getElementById('profileTargetBand').value = targetBand;
+    document.getElementById('onboardingTargetBand').value = targetBand;
+
+    const targetDisplay = document.getElementById('targetBandDisplay');
+    if (targetDisplay && targetDisplay.firstChild) targetDisplay.firstChild.textContent = targetBand;
+    document.getElementById('profileTargetBandDisplay').textContent = targetBand;
+    updateGoalScale(profile.targetBand);
+}
+
+function updateGoalScale(targetBand) {
+    const fullSegments = Math.floor(targetBand);
+    const hasHalfSegment = targetBand % 1 === 0.5;
+    document.querySelectorAll('.goal-scale > span').forEach((segment, index) => {
+        segment.classList.toggle('is-reached', index < fullSegments);
+        segment.classList.toggle('is-partial', hasHalfSegment && index === fullSegments);
+    });
+}
+
+function initProfile() {
+    document.getElementById('profileSettingsForm').addEventListener('submit', saveProfileSettings);
+    document.getElementById('onboardingForm').addEventListener('submit', completeProfileOnboarding);
+    document.getElementById('onboardingDialog').addEventListener('cancel', event => event.preventDefault());
+
+    let saved;
+    try {
+        saved = localStorage.getItem(profileStorageKey);
+    } catch (error) {
+        showProfileError('Unable to read the saved profile.', error, 'onboardingStatus');
+    }
+
+    if (saved) {
+        let profile;
+        try {
+            profile = JSON.parse(saved);
+        } catch (error) {
+            showProfileError('Saved profile data is not valid JSON.', error, 'onboardingStatus');
+        }
+
+        if (profile !== undefined) {
+            if (!profile || typeof profile !== 'object' || Array.isArray(profile)) {
+                showProfileError('Saved profile data has an unexpected format.', new TypeError('Invalid profile data.'), 'onboardingStatus');
+            } else {
+                const hasValidName =
+                    typeof profile.name === 'string' &&
+                    Boolean(profile.name.trim()) &&
+                    profile.name.trim().length <= 40;
+                if (hasValidName) {
+                    activeProfile.name = profile.name.trim();
+                } else {
+                    showProfileError('Saved profile name has an unexpected format.', new TypeError('Invalid profile name.'), 'onboardingStatus');
+                }
+
+                if (profile.targetBand !== undefined) {
+                    if (isValidTargetBand(profile.targetBand)) {
+                        activeProfile.targetBand = profile.targetBand;
+                    } else {
+                        showProfileError('Saved target band has an unexpected format.', new TypeError('Invalid target band.'), 'onboardingStatus');
+                    }
+                }
+                activeProfile.onboardingComplete =
+                    profile.onboardingComplete === true && hasValidName && isValidTargetBand(profile.targetBand);
+            }
+        }
+    }
+
+    applyProfile(activeProfile);
+    if (!activeProfile.onboardingComplete) {
+        document.getElementById('onboardingDialog').showModal();
+        document.getElementById('onboardingNameInput').focus();
+    }
+}
+
+function readProfileForm(form, statusId) {
+    const nameInput = form.querySelector('[name="name"]');
+    const targetInput = form.querySelector('[name="targetBand"]');
+    const name = nameInput.value.trim();
+    const targetBand = Number(targetInput.value);
+    if (!name || name.length > 40) {
+        showProfileStatus('Enter a name of 1 to 40 characters.', true, statusId);
+        nameInput.focus();
+        return null;
+    }
+    if (!isValidTargetBand(targetBand)) {
+        showProfileStatus('Choose a target band between 1.0 and 9.0.', true, statusId);
+        targetInput.focus();
+        return null;
+    }
+    return { name, targetBand };
+}
+
+function saveProfile(name, targetBand, statusId) {
+    const profile = { name, targetBand, onboardingComplete: true };
+    try {
+        localStorage.setItem(profileStorageKey, JSON.stringify(profile));
+    } catch (error) {
+        showProfileError('Unable to save the profile.', error, statusId || 'onboardingStatus');
+        return false;
+    }
+
+    applyProfile(profile);
+    const dialog = document.getElementById('onboardingDialog');
+    if (dialog.open) dialog.close();
+    if (statusId) showProfileStatus('Profile saved on this device.', false, statusId);
+    return true;
+}
+
+function saveProfileSettings(event) {
+    event.preventDefault();
+    const profile = readProfileForm(event.currentTarget, 'profileSaveStatus');
+    if (!profile) return;
+    saveProfile(profile.name, profile.targetBand, 'profileSaveStatus');
+}
+
+function completeProfileOnboarding(event) {
+    event.preventDefault();
+    const profile = readProfileForm(event.currentTarget, 'onboardingStatus');
+    if (!profile) return;
+    saveProfile(profile.name, profile.targetBand, null);
 }
 
 function refreshMockProgress() {
@@ -207,6 +369,7 @@ window.addEventListener('storage', event => {
                 dashboard: 'Overview',
                 vocabulary: 'Vocabulary',
                 podcasts: 'English Podcasts',
+                profile: 'Profile',
                 'mock-test': 'Mock tests'
             };
             document.getElementById('activePageTitle').textContent = pageTitles[pageName] || 'Overview';
@@ -369,6 +532,7 @@ window.addEventListener('storage', event => {
         // Initialize on Load
         window.addEventListener('load', function() {
             initTheme();
+            initProfile();
             initChart();
             renderSkillProgress();
         });
