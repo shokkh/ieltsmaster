@@ -573,6 +573,72 @@
             margin-bottom: 2rem;
         }
 
+        .mock-tabs {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .mock-tab {
+            border: 1px solid var(--border-color);
+            background: var(--card-bg);
+            color: var(--text-secondary);
+            border-radius: 14px;
+            padding: 1.25rem 1rem;
+            cursor: pointer;
+            font: inherit;
+            font-weight: 700;
+            transition: all 0.2s ease;
+        }
+
+        .mock-tab i {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 1.35rem;
+            color: var(--primary-color);
+        }
+
+        .mock-tab:hover,
+        .mock-tab.active {
+            border-color: var(--primary-color);
+            background: var(--primary-light);
+            color: var(--primary-color);
+        }
+
+        .mock-panel {
+            display: none;
+        }
+
+        .mock-panel.active {
+            display: block;
+        }
+
+        .writing-area,
+        .speaking-area {
+            width: 100%;
+            min-height: 220px;
+            resize: vertical;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            background: var(--input-bg);
+            color: var(--text-primary);
+            padding: 1rem;
+            font: inherit;
+        }
+
+        .mock-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .mock-tabs {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
         .test-info {
             display: flex;
             gap: 2rem;
@@ -1108,69 +1174,132 @@
         <div class="container">
             <div class="section-header">
                 <h1 class="section-title">Mock Test</h1>
-                <p class="section-subtitle">Take a full-length practice test to simulate the real IELTS exam</p>
+                <p class="section-subtitle">Choose a skill and simulate the real IELTS exam</p>
             </div>
 
-            <div class="test-header">
-                <h2 style="color: var(--text-primary); margin-bottom: 0.5rem;">IELTS Reading Mock Test #1</h2>
-                <p style="color: var(--text-secondary); margin-bottom: 1rem;">Academic Module - 60 minutes</p>
-                <div class="test-info">
-                    <div class="test-info-item">
-                        <i class="fas fa-clock"></i>
-                        <span>60 minutes</span>
-                    </div>
-                    <div class="test-info-item">
-                        <i class="fas fa-question-circle"></i>
-                        <span>40 questions</span>
-                    </div>
-                    <div class="test-info-item">
-                        <i class="fas fa-file-alt"></i>
-                        <span>3 passages</span>
-                    </div>
-                    <div class="test-info-item">
-                        <i class="fas fa-star"></i>
-                        <span>Band 0-9</span>
-                    </div>
-                </div>
-                <button class="btn btn-primary" style="margin-top: 1.5rem;">
-                    <i class="fas fa-play"></i> Start Test
+            <div class="mock-tabs" role="tablist" aria-label="Mock test skills">
+                <button class="mock-tab active" data-mock="listening" type="button">
+                    <i class="fas fa-headphones"></i>Listening
+                </button>
+                <button class="mock-tab" data-mock="reading" type="button">
+                    <i class="fas fa-book-open"></i>Reading
+                </button>
+                <button class="mock-tab" data-mock="writing" type="button">
+                    <i class="fas fa-pen"></i>Writing
+                </button>
+                <button class="mock-tab" data-mock="speaking" type="button">
+                    <i class="fas fa-microphone"></i>Speaking
                 </button>
             </div>
 
-            <div class="question-list">
-                <h3 style="color: var(--text-primary); margin-bottom: 1.5rem;">Sample Questions</h3>
-                
-                <div class="question-item">
-                    <div class="question-number">Question 1</div>
-                    <div class="question-text">
-                        The passage suggests that climate change is primarily caused by:
+            <div id="mock-listening" class="mock-panel active">
+                <div class="test-header">
+                    <h2>IELTS Listening Mock Test #1</h2>
+                    <p style="color: var(--text-secondary); margin-bottom: 1rem;">Academic & General Training - 30 minutes</p>
+                    <div class="test-info">
+                        <div class="test-info-item"><i class="fas fa-clock"></i><span>30 minutes</span></div>
+                        <div class="test-info-item"><i class="fas fa-question-circle"></i><span>40 questions</span></div>
+                        <div class="test-info-item"><i class="fas fa-headphones"></i><span>4 sections</span></div>
                     </div>
-                    <div class="option">A) Natural weather patterns</div>
-                    <div class="option">B) Human activities and greenhouse gas emissions</div>
-                    <div class="option">C) Solar radiation changes</div>
-                    <div class="option">D) Volcanic eruptions</div>
                 </div>
-
-                <div class="question-item">
-                    <div class="question-number">Question 2</div>
-                    <div class="question-text">
-                        According to the text, renewable energy sources include:
+                <div class="question-list">
+                    <h3 style="margin-bottom: 1.5rem;">Sample Questions</h3>
+                    <div class="question-item">
+                        <div class="question-number">Question 1</div>
+                        <div class="question-text">What time does the library close on Saturdays?</div>
+                        <div class="option">A) 12:00 pm</div>
+                        <div class="option">B) 4:00 pm</div>
+                        <div class="option">C) 6:00 pm</div>
                     </div>
-                    <div class="option">A) Coal and oil</div>
-                    <div class="option">B) Natural gas</div>
-                    <div class="option">C) Solar and wind power</div>
-                    <div class="option">D) Nuclear energy only</div>
+                    <div class="question-item">
+                        <div class="question-number">Question 2</div>
+                        <div class="question-text">Which item must the student bring to the interview?</div>
+                        <div class="option">A) Passport</div>
+                        <div class="option">B) Identification card</div>
+                        <div class="option">C) Driving licence</div>
+                    </div>
                 </div>
+            </div>
 
-                <div class="question-item">
-                    <div class="question-number">Question 3</div>
-                    <div class="question-text">
-                        The author's main argument is that:
+            <div id="mock-reading" class="mock-panel">
+                <div class="test-header">
+                    <h2>IELTS Reading Mock Test #1</h2>
+                    <p style="color: var(--text-secondary); margin-bottom: 1rem;">Academic Module - 60 minutes</p>
+                    <div class="test-info">
+                        <div class="test-info-item"><i class="fas fa-clock"></i><span>60 minutes</span></div>
+                        <div class="test-info-item"><i class="fas fa-question-circle"></i><span>40 questions</span></div>
+                        <div class="test-info-item"><i class="fas fa-file-alt"></i><span>3 passages</span></div>
                     </div>
-                    <div class="option">A) Technology cannot solve environmental problems</div>
-                    <div class="option">B) Immediate action is needed to address climate change</div>
-                    <div class="option">C) Economic growth is more important than the environment</div>
-                    <div class="option">D) Climate change is a natural phenomenon</div>
+                </div>
+                <div class="question-list">
+                    <h3 style="margin-bottom: 1.5rem;">Sample Questions</h3>
+                    <div class="question-item">
+                        <div class="question-number">Question 1</div>
+                        <div class="question-text">The passage suggests that climate change is primarily caused by:</div>
+                        <div class="option">A) Natural weather patterns</div>
+                        <div class="option">B) Human activities and greenhouse gas emissions</div>
+                        <div class="option">C) Solar radiation changes</div>
+                        <div class="option">D) Volcanic eruptions</div>
+                    </div>
+                    <div class="question-item">
+                        <div class="question-number">Question 2</div>
+                        <div class="question-text">According to the text, renewable energy sources include:</div>
+                        <div class="option">A) Coal and oil</div>
+                        <div class="option">B) Natural gas</div>
+                        <div class="option">C) Solar and wind power</div>
+                        <div class="option">D) Nuclear energy only</div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="mock-writing" class="mock-panel">
+                <div class="test-header">
+                    <h2>IELTS Writing Mock Test #1</h2>
+                    <p style="color: var(--text-secondary); margin-bottom: 1rem;">Academic Module - 60 minutes</p>
+                    <div class="test-info">
+                        <div class="test-info-item"><i class="fas fa-clock"></i><span>60 minutes</span></div>
+                        <div class="test-info-item"><i class="fas fa-pen"></i><span>2 tasks</span></div>
+                        <div class="test-info-item"><i class="fas fa-star"></i><span>400 words recommended</span></div>
+                    </div>
+                </div>
+                <div class="question-list">
+                    <div class="question-item">
+                        <div class="question-number">Writing Task 1</div>
+                        <div class="question-text">Summarise the main features of a chart showing household energy use and compare the different sources.</div>
+                        <textarea class="writing-area" aria-label="Writing Task 1 answer" placeholder="Write at least 150 words..."></textarea>
+                    </div>
+                    <div class="question-item">
+                        <div class="question-number">Writing Task 2</div>
+                        <div class="question-text">Some people believe that universities should teach practical skills, while others think academic subjects are more important. Discuss both views and give your opinion.</div>
+                        <textarea class="writing-area" aria-label="Writing Task 2 answer" placeholder="Write at least 250 words..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div id="mock-speaking" class="mock-panel">
+                <div class="test-header">
+                    <h2>IELTS Speaking Mock Test #1</h2>
+                    <p style="color: var(--text-secondary); margin-bottom: 1rem;">One-to-one speaking assessment - 11-14 minutes</p>
+                    <div class="test-info">
+                        <div class="test-info-item"><i class="fas fa-clock"></i><span>11-14 minutes</span></div>
+                        <div class="test-info-item"><i class="fas fa-comments"></i><span>3 parts</span></div>
+                        <div class="test-info-item"><i class="fas fa-microphone"></i><span>Speaking practice</span></div>
+                    </div>
+                </div>
+                <div class="question-list">
+                    <div class="question-item">
+                        <div class="question-number">Part 1 - Introduction</div>
+                        <div class="question-text">Do you prefer studying alone or in a group? Why?</div>
+                    </div>
+                    <div class="question-item">
+                        <div class="question-number">Part 2 - Long Turn</div>
+                        <div class="question-text">Describe an important decision you made. You should say what the decision was, why you made it, and how it affected you.</div>
+                        <textarea class="speaking-area" aria-label="Speaking practice notes" placeholder="Use this area for preparation notes (1-2 minutes)..."></textarea>
+                    </div>
+                    <div class="question-item">
+                        <div class="question-number">Part 3 - Discussion</div>
+                        <div class="question-text">How does education prepare people for challenges outside the classroom?</div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1234,6 +1363,15 @@
             link.addEventListener('click', function(e) {
                 e.preventDefault();
                 showPage(this.dataset.page);
+            });
+        });
+
+        document.querySelectorAll('.mock-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.mock-tab').forEach(item => item.classList.remove('active'));
+                document.querySelectorAll('.mock-panel').forEach(panel => panel.classList.remove('active'));
+                this.classList.add('active');
+                document.getElementById('mock-' + this.dataset.mock).classList.add('active');
             });
         });
 
