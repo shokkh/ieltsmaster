@@ -1,0 +1,386 @@
+const mockProgressStorageKey = 'ielts-master-mock-progress';
+const mockActivityStorageKey = 'ielts-master-mock-active-days';
+const mockProgressSkills = ['listening', 'reading', 'writing', 'speaking'];
+
+function showSkillProgressError(message, error) {
+    console.error(message, error);
+    const status = document.getElementById('skillProgressStatus');
+    status.textContent = 'Mock progress could not be loaded or saved in this browser.';
+    status.hidden = false;
+}
+
+function readCompletedMockRecords() {
+    let saved;
+    try {
+        saved = localStorage.getItem(mockProgressStorageKey);
+    } catch (error) {
+        showSkillProgressError('Unable to read saved mock progress.', error);
+        return null;
+    }
+    if (!saved) return [];
+
+    let records;
+    try {
+        records = JSON.parse(saved);
+    } catch (error) {
+        showSkillProgressError('Saved mock progress is not valid JSON.', error);
+        return null;
+    }
+
+    if (!Array.isArray(records) || records.some(record =>
+        !record ||
+        !mockProgressSkills.includes(record.skill) ||
+        typeof record.paperId !== 'string'
+    )) {
+        showSkillProgressError('Saved mock progress has an unexpected format.', new TypeError('Invalid mock progress data.'));
+        return null;
+    }
+    return records;
+}
+
+function renderSkillProgress() {
+    const status = document.getElementById('skillProgressStatus');
+    const bank = window.IELTS_MOCK_BANK;
+    if (!bank) {
+        showSkillProgressError('Mock question bank is unavailable.', new Error('IELTS_MOCK_BANK was not loaded.'));
+        return;
+    }
+
+    const records = readCompletedMockRecords();
+    if (!records) return;
+    status.hidden = true;
+    status.textContent = '';
+
+    let totalCompleted = 0;
+    document.querySelectorAll('[data-skill-progress]').forEach(container => {
+        const skill = container.dataset.skillProgress;
+        const availableIds = skill === 'speaking'
+            ? new Set(['famous-person-interview'])
+            : new Set((bank[skill] || []).map(paper => paper.id));
+        const completedIds = new Set(records
+            .filter(record => record.skill === skill && availableIds.has(record.paperId))
+            .map(record => record.paperId));
+        const total = availableIds.size;
+        const completed = completedIds.size;
+        const percent = total ? Math.round((completed / total) * 100) : 0;
+        const count = container.querySelector('[data-progress-completed]');
+        const totalLabel = container.querySelector('[data-progress-total]');
+        const bar = container.querySelector('[role="progressbar"]');
+        const fill = container.querySelector('[data-progress-fill]');
+
+        if (!count || !totalLabel || !bar || !fill) {
+            showSkillProgressError('Skill progress markup is incomplete.', new Error(`Missing progress elements for ${skill}.`));
+            return;
+        }
+
+        totalCompleted += completed;
+        count.textContent = String(completed);
+        totalLabel.textContent = String(total);
+        bar.setAttribute('aria-valuemax', String(total));
+        bar.setAttribute('aria-valuenow', String(completed));
+        bar.setAttribute('aria-valuetext', `${completed} of ${total} mocks completed`);
+        fill.style.width = `${percent}%`;
+    });
+
+    const overallCount = document.getElementById('completedMockCount');
+    if (overallCount) overallCount.textContent = String(totalCompleted);
+}
+
+function localDateKey(date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+
+function isValidLocalDateKey(value) {
+    if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+    const [year, month, day] = value.split('-').map(Number);
+    const date = new Date(year, month - 1, day);
+    return date.getFullYear() === year && date.getMonth() === month - 1 && date.getDate() === day;
+}
+
+function showPerformanceChartError(message, error) {
+    console.error(message, error);
+    const status = document.getElementById('performanceChartStatus');
+    status.textContent = 'Active-day history could not be loaded or charted in this browser.';
+    status.hidden = false;
+}
+
+function readMockActiveDays() {
+    let saved;
+    try {
+        saved = localStorage.getItem(mockActivityStorageKey);
+    } catch (error) {
+        showPerformanceChartError('Unable to read active-day history.', error);
+        return null;
+    }
+    if (!saved) return [];
+
+    let days;
+    try {
+        days = JSON.parse(saved);
+    } catch (error) {
+        showPerformanceChartError('Active-day history is not valid JSON.', error);
+        return null;
+    }
+    if (!Array.isArray(days) || days.some(day => !isValidLocalDateKey(day))) {
+        showPerformanceChartError('Active-day history has an unexpected format.', new TypeError('Invalid active-day data.'));
+        return null;
+    }
+    return [...new Set(days)].sort();
+}
+
+function renderRecentMockActivity(days) {
+    const list = document.getElementById('recentMockActivity');
+    if (!list) return;
+    list.replaceChildren();
+
+    const recentDays = days.filter(day => day <= localDateKey(new Date())).slice(-4).reverse();
+    if (recentDays.length === 0) {
+        const empty = document.createElement('p');
+        empty.className = 'activity-empty';
+        empty.textContent = 'No mock activity yet. Submit a mock to start tracking active days.';
+        list.append(empty);
+        return;
+    }
+
+    recentDays.forEach(day => {
+        const [year, month, date] = day.split('-').map(Number);
+        const itemDate = new Date(year, month - 1, date);
+        const item = document.createElement('div');
+        item.className = 'activity-item';
+        item.innerHTML = '<div class="activity-icon icon-blue"><i class="fas fa-calendar-check" aria-hidden="true"></i></div><div class="activity-content"><div class="activity-title">Mock practice completed</div><div class="activity-meta"></div></div>';
+        item.querySelector('.activity-meta').textContent = `Active day · ${itemDate.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}`;
+        list.append(item);
+    });
+}
+
+function refreshMockProgress() {
+    renderSkillProgress();
+    updatePerformanceChart();
+}
+
+window.addEventListener('ielts:mock-progress-updated', refreshMockProgress);
+window.addEventListener('storage', event => {
+    if (event.key === mockProgressStorageKey || event.key === mockActivityStorageKey || event.key === null) {
+        refreshMockProgress();
+    }
+});
+
+// Theme Management
+        function initTheme() {
+            const savedTheme = localStorage.getItem('ielts-theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            updateThemeIcon(savedTheme);
+        }
+
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('ielts-theme', newTheme);
+            updateThemeIcon(newTheme);
+        }
+
+        function updateThemeIcon(theme) {
+            const icon = document.getElementById('themeIcon');
+            icon.className = theme === 'light' ? 'fas fa-sun' : 'fas fa-moon';
+        }
+
+        // Navigation
+        function showPage(pageName) {
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            document.getElementById(pageName).classList.add('active');
+
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+                if (link.dataset.page === pageName) {
+                    link.classList.add('active');
+                }
+            });
+
+            const pageTitles = {
+                dashboard: 'Overview',
+                vocabulary: 'Vocabulary',
+                podcasts: 'English Podcasts',
+                'mock-test': 'Mock tests'
+            };
+            document.getElementById('activePageTitle').textContent = pageTitles[pageName] || 'Overview';
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            if (window.innerWidth <= 900) {
+                closeMenu();
+            }
+
+            // Initialize chart if dashboard
+            if (pageName === 'dashboard') {
+                setTimeout(initChart, 100);
+            }
+        }
+
+        // Mobile Menu
+        function toggleMenu() {
+            const navLinks = document.getElementById('navLinks');
+            const menuButton = document.querySelector('.hamburger');
+            const isOpen = navLinks.classList.toggle('active');
+
+            menuButton.setAttribute('aria-expanded', String(isOpen));
+            menuButton.setAttribute('aria-label', isOpen ? 'Close menu' : 'Open menu');
+        }
+
+        function closeMenu() {
+            document.getElementById('navLinks').classList.remove('active');
+
+            const menuButton = document.querySelector('.hamburger');
+            menuButton.setAttribute('aria-expanded', 'false');
+            menuButton.setAttribute('aria-label', 'Open menu');
+        }
+
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 900) {
+                closeMenu();
+            }
+        });
+
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeMenu();
+            }
+        });
+
+        // Nav Links Click Handler
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                showPage(this.dataset.page);
+            });
+        });
+
+        // Chart Initialization
+        function initChart() {
+            updatePerformanceChart();
+        }
+
+        function updatePerformanceChart() {
+            const canvas = document.getElementById('performanceChart');
+            if (!canvas) return;
+            const activeDays = readMockActiveDays();
+            if (!activeDays) return;
+
+            const status = document.getElementById('performanceChartStatus');
+            status.hidden = true;
+            status.textContent = '';
+            renderRecentMockActivity(activeDays);
+
+            if (typeof Chart === 'undefined') {
+                showPerformanceChartError('Chart.js is unavailable.', new Error('Chart.js did not load.'));
+                return;
+            }
+
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const firstDay = new Date(today);
+            firstDay.setDate(firstDay.getDate() - 29);
+            const firstDayKey = localDateKey(firstDay);
+            const todayKey = localDateKey(today);
+            const activeDaySet = new Set(activeDays.filter(day => day <= todayKey));
+            let cumulativeDays = [...activeDaySet].filter(day => day < firstDayKey).length;
+            const labels = [];
+            const values = [];
+
+            for (const date = new Date(firstDay); date <= today; date.setDate(date.getDate() + 1)) {
+                const dayKey = localDateKey(date);
+                if (activeDaySet.has(dayKey)) cumulativeDays += 1;
+                labels.push(date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }));
+                values.push(cumulativeDays);
+            }
+
+            if (canvas.chart) {
+                canvas.chart.data.labels = labels;
+                canvas.chart.data.datasets[0].data = values;
+                canvas.chart.update();
+                canvas.chart.resize();
+                return;
+            }
+
+            const ctx = canvas.getContext('2d');
+            canvas.chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels,
+                    datasets: [{
+                        label: 'Cumulative active days',
+                        data: values,
+                        borderColor: '#3b82f6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        pointRadius: 2,
+                        tension: 0.3,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                precision: 0
+                            },
+                            title: {
+                                display: true,
+                                text: 'Total active days'
+                            },
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Option Selection
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('option')) {
+                const questionItem = e.target.closest('.question-item');
+                questionItem.querySelectorAll('.option').forEach(opt => {
+                    opt.classList.remove('selected');
+                });
+                e.target.classList.add('selected');
+            }
+        });
+
+        // Initialize on Load
+        window.addEventListener('load', function() {
+            initTheme();
+            initChart();
+            renderSkillProgress();
+        });
+
+        // Update chart colors on theme change
+        const originalToggleTheme = toggleTheme;
+        toggleTheme = function() {
+            originalToggleTheme();
+            const canvas = document.getElementById('performanceChart');
+            if (canvas && canvas.chart) {
+                canvas.chart.destroy();
+                canvas.chart = null;
+                setTimeout(initChart, 100);
+            }
+        };

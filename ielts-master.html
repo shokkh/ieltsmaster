@@ -7,799 +7,31 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        /* CSS Variables for Theme */
-        :root {
-            --bg-primary: #ffffff;
-            --bg-secondary: #f9fafb;
-            --bg-tertiary: #f3f4f6;
-            --text-primary: #1f2937;
-            --text-secondary: #6b7280;
-            --text-tertiary: #9ca3af;
-            --primary-color: #3b82f6;
-            --primary-hover: #2563eb;
-            --primary-light: #dbeafe;
-            --border-color: #e5e7eb;
-            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-            --success: #10b981;
-            --warning: #f59e0b;
-            --error: #ef4444;
-            --card-bg: #ffffff;
-            --nav-bg: #ffffff;
-            --input-bg: #ffffff;
-        }
-
-        [data-theme="dark"] {
-            --bg-primary: #121212;
-            --bg-secondary: #1e1e1e;
-            --bg-tertiary: #2a2a2a;
-            --text-primary: #e5e7eb;
-            --text-secondary: #9ca3af;
-            --text-tertiary: #6b7280;
-            --primary-color: #60a5fa;
-            --primary-hover: #3b82f6;
-            --primary-light: #1e3a5f;
-            --border-color: #374151;
-            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
-            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
-            --success: #34d399;
-            --warning: #fbbf24;
-            --error: #f87171;
-            --card-bg: #1e1e1e;
-            --nav-bg: #1e1e1e;
-            --input-bg: #2a2a2a;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            line-height: 1.6;
-            transition: background-color 0.3s ease, color 0.3s ease;
-        }
-
-        /* Navigation */
-        nav {
-            background: var(--nav-bg);
-            border-bottom: 1px solid var(--border-color);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            transition: all 0.3s ease;
-            box-shadow: var(--shadow-sm);
-        }
-
-        .nav-container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 1rem 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .logo {
-            font-size: 1.5rem;
-            font-weight: 800;
-            color: var(--primary-color);
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            transition: transform 0.2s ease;
-        }
-
-        .logo:hover {
-            transform: scale(1.05);
-        }
-
-        .nav-links {
-            display: flex;
-            list-style: none;
-            gap: 2rem;
-            align-items: center;
-        }
-
-        .nav-link {
-            text-decoration: none;
-            color: var(--text-secondary);
-            font-weight: 500;
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
-            transition: all 0.2s ease;
-        }
-
-        .nav-link:hover, .nav-link.active {
-            color: var(--primary-color);
-            background: var(--primary-light);
-        }
-
-        /* Theme Toggle */
-        .theme-toggle {
-            position: relative;
-            width: 60px;
-            height: 30px;
-            background: var(--bg-tertiary);
-            border-radius: 30px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            padding: 0 4px;
-            border: 2px solid var(--border-color);
-            transition: all 0.3s ease;
-        }
-
-        .theme-toggle:hover {
-            border-color: var(--primary-color);
-        }
-
-        .theme-toggle-slider {
-            width: 22px;
-            height: 22px;
-            background: var(--primary-color);
-            border-radius: 50%;
-            position: absolute;
-            left: 4px;
-            transition: transform 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 0.7rem;
-        }
-
-        [data-theme="dark"] .theme-toggle-slider {
-            transform: translateX(30px);
-        }
-
-        /* Hamburger */
-        .hamburger {
-            display: none;
-            flex-direction: column;
-            gap: 0.25rem;
-            cursor: pointer;
-            padding: 0.5rem;
-        }
-
-        .hamburger span {
-            width: 25px;
-            height: 2.5px;
-            background: var(--text-primary);
-            border-radius: 2px;
-            transition: all 0.3s ease;
-        }
-
-        /* Container */
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 2rem;
-        }
-
-        /* Page */
-        .page {
-            display: none;
-            animation: fadeIn 0.4s ease;
-        }
-
-        .page.active {
-            display: block;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* Dashboard Grid */
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        /* Card */
-        .card {
-            background: var(--card-bg);
-            border-radius: 16px;
-            padding: 1.5rem;
-            box-shadow: var(--shadow-md);
-            border: 1px solid var(--border-color);
-            transition: all 0.3s ease;
-        }
-
-        .card:hover {
-            transform: translateY(-4px);
-            box-shadow: var(--shadow-lg);
-        }
-
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1rem;
-        }
-
-        .card-title {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: var(--text-primary);
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .card-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2rem;
-            color: white;
-        }
-
-        .icon-blue { background: linear-gradient(135deg, #3b82f6, #2563eb); }
-        .icon-green { background: linear-gradient(135deg, #10b981, #059669); }
-        .icon-orange { background: linear-gradient(135deg, #f59e0b, #d97706); }
-        .icon-purple { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
-        .icon-pink { background: linear-gradient(135deg, #ec4899, #db2777); }
-        .icon-red { background: linear-gradient(135deg, #ef4444, #dc2626); }
-
-        /* Stats Card */
-        .stat-number {
-            font-size: 2.5rem;
-            font-weight: 800;
-            color: var(--primary-color);
-            margin: 0.5rem 0;
-        }
-
-        .stat-label {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-        }
-
-        .stat-change {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.25rem;
-            padding: 0.25rem 0.5rem;
-            border-radius: 6px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            margin-top: 0.5rem;
-        }
-
-        .stat-change.positive {
-            background: #d1fae5;
-            color: #065f46;
-        }
-
-        [data-theme="dark"] .stat-change.positive {
-            background: #064e3b;
-            color: #34d399;
-        }
-
-        /* Progress Bar */
-        .progress-container {
-            margin: 1rem 0;
-        }
-
-        .progress-label {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 0.5rem;
-            font-size: 0.9rem;
-        }
-
-        .progress-bar {
-            height: 8px;
-            background: var(--bg-tertiary);
-            border-radius: 10px;
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--primary-color), var(--primary-hover));
-            border-radius: 10px;
-            transition: width 0.5s ease;
-        }
-
-        /* Activity Item */
-        .activity-list {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
-
-        .activity-item {
-            display: flex;
-            gap: 1rem;
-            padding: 1rem;
-            background: var(--bg-secondary);
-            border-radius: 12px;
-            transition: all 0.2s ease;
-        }
-
-        .activity-item:hover {
-            background: var(--bg-tertiary);
-            transform: translateX(4px);
-        }
-
-        .activity-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-        }
-
-        .activity-content {
-            flex: 1;
-        }
-
-        .activity-title {
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 0.25rem;
-        }
-
-        .activity-meta {
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-        }
-
-        /* Practice Grid */
-        .practice-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 1.5rem;
-            margin-top: 2rem;
-        }
-
-        .practice-card {
-            background: var(--card-bg);
-            border-radius: 16px;
-            padding: 2rem;
-            border: 1px solid var(--border-color);
-            text-align: center;
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-
-        .practice-card:hover {
-            transform: translateY(-8px);
-            box-shadow: var(--shadow-lg);
-            border-color: var(--primary-color);
-        }
-
-        .practice-icon {
-            width: 80px;
-            height: 80px;
-            margin: 0 auto 1.5rem;
-            border-radius: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2.5rem;
-            color: white;
-        }
-
-        .practice-title {
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-            color: var(--text-primary);
-        }
-
-        .practice-description {
-            color: var(--text-secondary);
-            margin-bottom: 1rem;
-        }
-
-        .practice-stats {
-            display: flex;
-            justify-content: center;
-            gap: 2rem;
-            margin-top: 1.5rem;
-            padding-top: 1.5rem;
-            border-top: 1px solid var(--border-color);
-        }
-
-        .practice-stat {
-            text-align: center;
-        }
-
-        .practice-stat-value {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--primary-color);
-        }
-
-        .practice-stat-label {
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-        }
-
-        /* Button */
-        .btn {
-            padding: 0.75rem 1.5rem;
-            border: none;
-            border-radius: 10px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            text-decoration: none;
-            display: inline-block;
-            font-size: 1rem;
-        }
-
-        .btn-primary {
-            background: var(--primary-color);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: var(--primary-hover);
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-md);
-        }
-
-        .btn-outline {
-            background: transparent;
-            color: var(--primary-color);
-            border: 2px solid var(--primary-color);
-        }
-
-        .btn-outline:hover {
-            background: var(--primary-color);
-            color: white;
-        }
-
-        /* Vocabulary Card */
-        .vocab-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 1.5rem;
-            margin-top: 2rem;
-        }
-
-        .vocab-card {
-            background: var(--card-bg);
-            border-radius: 16px;
-            padding: 2rem;
-            border: 1px solid var(--border-color);
-            transition: all 0.3s ease;
-        }
-
-        .vocab-card:hover {
-            transform: translateY(-4px);
-            box-shadow: var(--shadow-lg);
-            border-color: var(--primary-color);
-        }
-
-        .vocab-word {
-            font-size: 2rem;
-            font-weight: 700;
-            color: var(--primary-color);
-            margin-bottom: 0.5rem;
-        }
-
-        .vocab-pronunciation {
-            color: var(--text-secondary);
-            font-style: italic;
-            margin-bottom: 1rem;
-        }
-
-        .vocab-definition {
-            color: var(--text-primary);
-            margin-bottom: 1rem;
-            line-height: 1.6;
-        }
-
-        .vocab-example {
-            background: var(--bg-secondary);
-            padding: 1rem;
-            border-radius: 10px;
-            border-left: 4px solid var(--primary-color);
-            font-style: italic;
-            color: var(--text-secondary);
-        }
-
-        .badge {
-            display: inline-block;
-            padding: 0.25rem 0.75rem;
-            border-radius: 6px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            margin-bottom: 1rem;
-        }
-
-        .badge-primary {
-            background: var(--primary-light);
-            color: var(--primary-color);
-        }
-
-        /* Section Header */
-        .section-header {
-            margin-bottom: 2rem;
-        }
-
-        .section-title {
-            font-size: 2rem;
-            font-weight: 800;
-            color: var(--text-primary);
-            margin-bottom: 0.5rem;
-        }
-
-        .section-subtitle {
-            color: var(--text-secondary);
-            font-size: 1.1rem;
-        }
-
-        /* Chart Container */
-        .chart-container {
-            position: relative;
-            height: 300px;
-            margin-top: 1rem;
-        }
-
-        /* Mock Test */
-        .test-header {
-            background: var(--card-bg);
-            border-radius: 16px;
-            padding: 2rem;
-            border: 1px solid var(--border-color);
-            margin-bottom: 2rem;
-        }
-
-        .mock-tabs {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 1rem;
-            margin-bottom: 2rem;
-        }
-
-        .mock-tab {
-            border: 1px solid var(--border-color);
-            background: var(--card-bg);
-            color: var(--text-secondary);
-            border-radius: 14px;
-            padding: 1.25rem 1rem;
-            cursor: pointer;
-            font: inherit;
-            font-weight: 700;
-            transition: all 0.2s ease;
-        }
-
-        .mock-tab i {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-size: 1.35rem;
-            color: var(--primary-color);
-        }
-
-        .mock-tab:hover,
-        .mock-tab.active {
-            border-color: var(--primary-color);
-            background: var(--primary-light);
-            color: var(--primary-color);
-        }
-
-        .mock-panel {
-            display: none;
-        }
-
-        .mock-panel.active {
-            display: block;
-        }
-
-        .writing-area,
-        .speaking-area {
-            width: 100%;
-            min-height: 220px;
-            resize: vertical;
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            background: var(--input-bg);
-            color: var(--text-primary);
-            padding: 1rem;
-            font: inherit;
-        }
-
-        .mock-actions {
-            display: flex;
-            gap: 1rem;
-            margin-top: 1.5rem;
-        }
-
-        @media (max-width: 768px) {
-            .mock-tabs {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
-        .test-info {
-            display: flex;
-            gap: 2rem;
-            flex-wrap: wrap;
-            margin-top: 1.5rem;
-        }
-
-        .test-info-item {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: var(--text-secondary);
-        }
-
-        .test-info-item i {
-            color: var(--primary-color);
-        }
-
-        .question-list {
-            background: var(--card-bg);
-            border-radius: 16px;
-            padding: 2rem;
-            border: 1px solid var(--border-color);
-        }
-
-        .question-item {
-            padding: 1.5rem;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .question-item:last-child {
-            border-bottom: none;
-        }
-
-        .question-number {
-            font-weight: 700;
-            color: var(--primary-color);
-            margin-bottom: 0.5rem;
-        }
-
-        .question-text {
-            color: var(--text-primary);
-            margin-bottom: 1rem;
-            line-height: 1.6;
-        }
-
-        .option {
-            padding: 1rem;
-            background: var(--bg-secondary);
-            border-radius: 10px;
-            margin-bottom: 0.5rem;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            border: 2px solid transparent;
-        }
-
-        .option:hover {
-            background: var(--bg-tertiary);
-            border-color: var(--primary-color);
-        }
-
-        .option.selected {
-            background: var(--primary-light);
-            border-color: var(--primary-color);
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .nav-links {
-                display: none;
-                position: absolute;
-                top: 100%;
-                left: 0;
-                width: 100%;
-                background: var(--nav-bg);
-                flex-direction: column;
-                padding: 1rem;
-                border-top: 1px solid var(--border-color);
-                box-shadow: var(--shadow-lg);
-            }
-
-            .nav-links.active {
-                display: flex;
-            }
-
-            .hamburger {
-                display: flex;
-            }
-
-            .dashboard-grid,
-            .practice-grid,
-            .vocab-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .section-title {
-                font-size: 1.5rem;
-            }
-
-            .container {
-                padding: 1rem;
-            }
-        }
-
-        /* Loading Animation */
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
-        }
-
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid var(--border-color);
-            border-top-color: var(--primary-color);
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-        }
-
-        /* Tooltip */
-        .tooltip {
-            position: relative;
-        }
-
-        .tooltip::after {
-            content: attr(data-tooltip);
-            position: absolute;
-            bottom: 100%;
-            left: 50%;
-            transform: translateX(-50%) translateY(-8px);
-            padding: 0.5rem 1rem;
-            background: var(--text-primary);
-            color: var(--bg-primary);
-            border-radius: 8px;
-            font-size: 0.85rem;
-            white-space: nowrap;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s ease;
-        }
-
-        .tooltip:hover::after {
-            opacity: 1;
-        }
-    </style>
+    <link rel="stylesheet" href="ielts-master.css">
+    <link rel="stylesheet" href="mock-tests.css">
 </head>
 <body>
     <!-- Navigation -->
     <nav>
         <div class="nav-container">
             <a href="#" class="logo" onclick="showPage('dashboard')">
-                <i class="fas fa-graduation-cap"></i>
-                IELTS Master
+                <span class="brand-mark">i</span>
+                <span>IELTS <span class="brand-light">Master</span></span>
             </a>
+            <div class="workspace-label"><span class="green-dot"></span>Your practice workspace</div>
             <ul class="nav-links" id="navLinks">
-                <li><a href="#" class="nav-link active" data-page="dashboard">Dashboard</a></li>
-                <li><a href="#" class="nav-link" data-page="practice">Practice</a></li>
-                <li><a href="#" class="nav-link" data-page="vocabulary">Vocabulary</a></li>
-                <li><a href="#" class="nav-link" data-page="mock-test">Mock Test</a></li>
+                <li><a href="#" class="nav-link active" data-page="dashboard"><i class="fas fa-chart-pie"></i>Overview</a></li>
+                <li><a href="#" class="nav-link" data-page="vocabulary"><i class="fas fa-book-open"></i>Vocabulary</a></li>
+                <li><a href="#" class="nav-link" data-page="podcasts"><i class="fas fa-podcast"></i>English Podcasts</a></li>
+                <li><a href="#" class="nav-link" data-page="mock-test"><i class="fas fa-list-check"></i>Mock tests</a></li>
+                <li class="sidebar-guide-item">
+                    <div class="sidebar-guide">
+                        <i class="fas fa-desktop"></i>
+                        <strong>Practise the real format.</strong>
+                        <p>Build familiarity with the clock, the questions, and the screen.</p>
+                        <button type="button" onclick="showPage('mock-test')">Take a mock test<i class="fas fa-chevron-right"></i></button>
+                    </div>
+                </li>
                 <li>
                     <div class="theme-toggle" onclick="toggleTheme()" data-tooltip="Toggle Theme">
                         <div class="theme-toggle-slider">
@@ -807,21 +39,65 @@
                         </div>
                     </div>
                 </li>
+                <li class="mobile-profile-item">
+                    <div class="mobile-profile">
+                        <span class="avatar-small">S</span>
+                        <span>Profile</span>
+                    </div>
+                </li>
             </ul>
-            <div class="hamburger" onclick="toggleMenu()">
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
+            <button type="button" class="hamburger" onclick="toggleMenu()" aria-label="Open menu" aria-controls="navLinks" aria-expanded="false">
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+            </button>
         </div>
     </nav>
+
+    <header class="workspace-header">
+        <div><span>Workspace</span><i class="fas fa-chevron-right"></i><strong id="activePageTitle">Overview</strong></div>
+        <div class="header-right"><span class="avatar-small">S</span></div>
+    </header>
 
     <!-- Dashboard Page -->
     <div id="dashboard" class="page active">
         <div class="container">
             <div class="section-header">
-                <h1 class="section-title">Welcome back, Student!</h1>
-                <p class="section-subtitle">Track your progress and continue your IELTS journey</p>
+                <div>
+                    <p class="date-line">Your IELTS preparation</p>
+                    <h1 class="section-title">Make test day feel familiar.</h1>
+                    <p class="section-subtitle">Your space to practise with purpose, one session at a time.</p>
+                </div>
+                <span class="academic-badge"><i class="fas fa-graduation-cap"></i>IELTS Academic</span>
+            </div>
+
+            <div class="studio-overview">
+                <section class="mock-feature">
+                    <div class="mock-feature-top">
+                        <span class="featured-label"><span></span>The complete rehearsal</span>
+                        <span class="format-badge"><i class="fas fa-desktop"></i>Computer-delivered format</span>
+                    </div>
+                    <h2>Your next test.<br>Without the surprises.</h2>
+                    <p>Explore the four IELTS skills and get familiar with the format for each part of the exam.</p>
+                    <div class="mock-sequence">
+                        <div><i class="fas fa-headphones"></i><span>Listening</span><small>~30 min</small></div>
+                        <div><i class="fas fa-book-open"></i><span>Reading</span><small>60 min</small></div>
+                        <div><i class="fas fa-pen"></i><span>Writing</span><small>60 min</small></div>
+                        <div><i class="fas fa-microphone"></i><span>Speaking</span><small>11-14 min</small></div>
+                    </div>
+                    <div class="mock-feature-bottom">
+                        <button class="lime-button" type="button" onclick="showPage('mock-test')">Explore mock tests<i class="fas fa-arrow-right"></i></button>
+                        <span>Listening · Reading · Writing · Speaking</span>
+                    </div>
+                </section>
+                <section class="goal-panel">
+                    <div class="goal-top"><span class="icon-tile"><i class="fas fa-bullseye"></i></span><span class="goal-label">Your target</span></div>
+                    <h3>Target band score</h3>
+                    <div class="target-number">7.5<span>/ 9</span></div>
+                    <div class="goal-scale"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+                    <p>A clear goal. A fresh start. Complete a practice session to start tracking your progress.</p>
+                    <div class="goal-footer"><i class="fas fa-shield-alt"></i><span>Your progress stays on this device.</span></div>
+                </section>
             </div>
 
             <div class="dashboard-grid">
@@ -853,12 +129,9 @@
                             Tests Completed
                         </div>
                     </div>
-                    <div class="stat-number">24</div>
-                    <div class="stat-label">Practice Tests</div>
-                    <div class="stat-change positive">
-                        <i class="fas fa-arrow-up"></i>
-                        8 this week
-                    </div>
+                    <div class="stat-number" id="completedMockCount">0</div>
+                    <div class="stat-label">Unique mock papers completed</div>
+                    <div class="stat-change">Saved on this device</div>
                 </div>
 
                 <!-- Study Streak -->
@@ -887,45 +160,46 @@
                     Skills Progress
                 </h3>
                 
-                <div class="progress-container">
+                <div class="progress-container" data-skill-progress="listening">
                     <div class="progress-label">
                         <span>Listening</span>
-                        <span><strong>8.0</strong> / 9.0</span>
+                        <span><strong data-progress-completed>0</strong> / <span data-progress-total>0</span> mocks</span>
                     </div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: 89%"></div>
+                    <div class="progress-bar" role="progressbar" aria-label="Listening mocks completed" aria-valuemin="0" aria-valuemax="0" aria-valuenow="0">
+                        <div class="progress-fill" data-progress-fill style="width: 0%"></div>
                     </div>
                 </div>
 
-                <div class="progress-container">
+                <div class="progress-container" data-skill-progress="reading">
                     <div class="progress-label">
                         <span>Reading</span>
-                        <span><strong>7.5</strong> / 9.0</span>
+                        <span><strong data-progress-completed>0</strong> / <span data-progress-total>0</span> mocks</span>
                     </div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: 83%"></div>
+                    <div class="progress-bar" role="progressbar" aria-label="Reading mocks completed" aria-valuemin="0" aria-valuemax="0" aria-valuenow="0">
+                        <div class="progress-fill" data-progress-fill style="width: 0%"></div>
                     </div>
                 </div>
 
-                <div class="progress-container">
+                <div class="progress-container" data-skill-progress="writing">
                     <div class="progress-label">
                         <span>Writing</span>
-                        <span><strong>7.0</strong> / 9.0</span>
+                        <span><strong data-progress-completed>0</strong> / <span data-progress-total>0</span> mocks</span>
                     </div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: 78%"></div>
+                    <div class="progress-bar" role="progressbar" aria-label="Writing mocks completed" aria-valuemin="0" aria-valuemax="0" aria-valuenow="0">
+                        <div class="progress-fill" data-progress-fill style="width: 0%"></div>
                     </div>
                 </div>
 
-                <div class="progress-container">
+                <div class="progress-container" data-skill-progress="speaking">
                     <div class="progress-label">
                         <span>Speaking</span>
-                        <span><strong>7.5</strong> / 9.0</span>
+                        <span><strong data-progress-completed>0</strong> / <span data-progress-total>0</span> mocks</span>
                     </div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: 83%"></div>
+                    <div class="progress-bar" role="progressbar" aria-label="Speaking mocks completed" aria-valuemin="0" aria-valuemax="0" aria-valuenow="0">
+                        <div class="progress-fill" data-progress-fill style="width: 0%"></div>
                     </div>
                 </div>
+                <p class="progress-status" id="skillProgressStatus" aria-live="polite" hidden></p>
             </div>
 
             <!-- Recent Activity -->
@@ -934,44 +208,7 @@
                     <i class="fas fa-history"></i>
                     Recent Activity
                 </h3>
-                <div class="activity-list">
-                    <div class="activity-item">
-                        <div class="activity-icon icon-blue">
-                            <i class="fas fa-headphones"></i>
-                        </div>
-                        <div class="activity-content">
-                            <div class="activity-title">Completed Listening Test #15</div>
-                            <div class="activity-meta">Score: 8.0 • 2 hours ago</div>
-                        </div>
-                    </div>
-                    <div class="activity-item">
-                        <div class="activity-icon icon-green">
-                            <i class="fas fa-book-open"></i>
-                        </div>
-                        <div class="activity-content">
-                            <div class="activity-title">Completed Reading Test #12</div>
-                            <div class="activity-meta">Score: 7.5 • Yesterday</div>
-                        </div>
-                    </div>
-                    <div class="activity-item">
-                        <div class="activity-icon icon-purple">
-                            <i class="fas fa-spell-check"></i>
-                        </div>
-                        <div class="activity-content">
-                            <div class="activity-title">Added 25 new vocabulary words</div>
-                            <div class="activity-meta">2 days ago</div>
-                        </div>
-                    </div>
-                    <div class="activity-item">
-                        <div class="activity-icon icon-orange">
-                            <i class="fas fa-pen"></i>
-                        </div>
-                        <div class="activity-content">
-                            <div class="activity-title">Submitted Writing Task 2</div>
-                            <div class="activity-meta">Score: 7.0 • 3 days ago</div>
-                        </div>
-                    </div>
-                </div>
+                <div class="activity-list" id="recentMockActivity" aria-live="polite"></div>
             </div>
 
             <!-- Performance Chart -->
@@ -980,101 +217,11 @@
                     <i class="fas fa-chart-area"></i>
                     Performance Over Time
                 </h3>
+                <p class="chart-caption">Cumulative active days. A day counts when you submit at least one mock.</p>
                 <div class="chart-container">
-                    <canvas id="performanceChart"></canvas>
+                    <canvas id="performanceChart" role="img" aria-label="Cumulative active days from completed mock practice"></canvas>
                 </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Practice Page -->
-    <div id="practice" class="page">
-        <div class="container">
-            <div class="section-header">
-                <h1 class="section-title">Practice Sections</h1>
-                <p class="section-subtitle">Choose a skill to practice and improve your IELTS score</p>
-            </div>
-
-            <div class="practice-grid">
-                <!-- Listening -->
-                <div class="practice-card">
-                    <div class="practice-icon icon-blue">
-                        <i class="fas fa-headphones"></i>
-                    </div>
-                    <h3 class="practice-title">Listening</h3>
-                    <p class="practice-description">Practice with real IELTS listening tests and improve your comprehension skills</p>
-                    <div class="practice-stats">
-                        <div class="practice-stat">
-                            <div class="practice-stat-value">15</div>
-                            <div class="practice-stat-label">Tests</div>
-                        </div>
-                        <div class="practice-stat">
-                            <div class="practice-stat-value">8.0</div>
-                            <div class="practice-stat-label">Avg Score</div>
-                        </div>
-                    </div>
-                    <button class="btn btn-primary" style="margin-top: 1rem; width: 100%;">Start Practice</button>
-                </div>
-
-                <!-- Reading -->
-                <div class="practice-card">
-                    <div class="practice-icon icon-green">
-                        <i class="fas fa-book-open"></i>
-                    </div>
-                    <h3 class="practice-title">Reading</h3>
-                    <p class="practice-description">Enhance your reading speed and comprehension with academic passages</p>
-                    <div class="practice-stats">
-                        <div class="practice-stat">
-                            <div class="practice-stat-value">12</div>
-                            <div class="practice-stat-label">Tests</div>
-                        </div>
-                        <div class="practice-stat">
-                            <div class="practice-stat-value">7.5</div>
-                            <div class="practice-stat-label">Avg Score</div>
-                        </div>
-                    </div>
-                    <button class="btn btn-primary" style="margin-top: 1rem; width: 100%;">Start Practice</button>
-                </div>
-
-                <!-- Writing -->
-                <div class="practice-card">
-                    <div class="practice-icon icon-orange">
-                        <i class="fas fa-pen"></i>
-                    </div>
-                    <h3 class="practice-title">Writing</h3>
-                    <p class="practice-description">Master essay writing with detailed feedback and band score estimation</p>
-                    <div class="practice-stats">
-                        <div class="practice-stat">
-                            <div class="practice-stat-value">8</div>
-                            <div class="practice-stat-label">Tasks</div>
-                        </div>
-                        <div class="practice-stat">
-                            <div class="practice-stat-value">7.0</div>
-                            <div class="practice-stat-label">Avg Score</div>
-                        </div>
-                    </div>
-                    <button class="btn btn-primary" style="margin-top: 1rem; width: 100%;">Start Practice</button>
-                </div>
-
-                <!-- Speaking -->
-                <div class="practice-card">
-                    <div class="practice-icon icon-purple">
-                        <i class="fas fa-microphone"></i>
-                    </div>
-                    <h3 class="practice-title">Speaking</h3>
-                    <p class="practice-description">Practice speaking with AI feedback and improve your fluency</p>
-                    <div class="practice-stats">
-                        <div class="practice-stat">
-                            <div class="practice-stat-value">10</div>
-                            <div class="practice-stat-label">Sessions</div>
-                        </div>
-                        <div class="practice-stat">
-                            <div class="practice-stat-value">7.5</div>
-                            <div class="practice-stat-label">Avg Score</div>
-                        </div>
-                    </div>
-                    <button class="btn btn-primary" style="margin-top: 1rem; width: 100%;">Start Practice</button>
-                </div>
+                <p class="chart-status" id="performanceChartStatus" aria-live="polite" hidden></p>
             </div>
         </div>
     </div>
@@ -1084,15 +231,26 @@
         <div class="container">
             <div class="section-header">
                 <h1 class="section-title">Vocabulary Builder</h1>
-                <p class="section-subtitle">Expand your vocabulary with essential words for IELTS success</p>
+                <p class="section-subtitle">Study IELTS and mock-test vocabulary with Uzbek translations and examples.</p>
             </div>
 
-            <div class="vocab-grid">
+            <div class="vocab-toolbar">
+                <form class="vocab-search" id="vocabSearchForm" role="search">
+                    <label class="sr-only" for="vocabSearch">Search vocabulary in English or Uzbek</label>
+                    <input id="vocabSearch" type="search" placeholder="Search in English or Uzbek">
+                    <button class="btn btn-primary" type="submit">Search</button>
+                </form>
+                <p class="vocab-results-count" id="vocabResultsCount" aria-live="polite"></p>
+            </div>
+            <p class="vocab-empty-state" id="vocabNoResults" hidden>No matching words found.</p>
+
+            <div class="vocab-grid" id="vocabGrid">
                 <!-- Vocab Card 1 -->
                 <div class="vocab-card">
                     <span class="badge badge-primary">Academic</span>
                     <div class="vocab-word">Profound</div>
                     <div class="vocab-pronunciation">/prəˈfaʊnd/</div>
+                    <div class="vocab-translation"><strong>O‘zbekcha:</strong> chuqur, teran</div>
                     <div class="vocab-definition">
                         <strong>Adjective:</strong> Having or showing great knowledge or insight; very great or intense.
                     </div>
@@ -1106,6 +264,7 @@
                     <span class="badge badge-primary">Business</span>
                     <div class="vocab-word">Leverage</div>
                     <div class="vocab-pronunciation">/ˈlevərɪdʒ/</div>
+                    <div class="vocab-translation"><strong>O‘zbekcha:</strong> ustunlik; samarali foydalanmoq</div>
                     <div class="vocab-definition">
                         <strong>Noun/Verb:</strong> The power to influence; to use something to maximum advantage.
                     </div>
@@ -1119,6 +278,7 @@
                     <span class="badge badge-primary">Science</span>
                     <div class="vocab-word">Hypothesis</div>
                     <div class="vocab-pronunciation">/haɪˈpɒθəsɪs/</div>
+                    <div class="vocab-translation"><strong>O‘zbekcha:</strong> gipoteza, ilmiy taxmin</div>
                     <div class="vocab-definition">
                         <strong>Noun:</strong> A proposed explanation made on limited evidence as a starting point for investigation.
                     </div>
@@ -1132,6 +292,7 @@
                     <span class="badge badge-primary">Environment</span>
                     <div class="vocab-word">Sustainability</div>
                     <div class="vocab-pronunciation">/səˌsteɪnəˈbɪləti/</div>
+                    <div class="vocab-translation"><strong>O‘zbekcha:</strong> barqarorlik</div>
                     <div class="vocab-definition">
                         <strong>Noun:</strong> The ability to maintain or support a process over time without depleting resources.
                     </div>
@@ -1145,6 +306,7 @@
                     <span class="badge badge-primary">Technology</span>
                     <div class="vocab-word">Innovation</div>
                     <div class="vocab-pronunciation">/ˌɪnəˈveɪʃn/</div>
+                    <div class="vocab-translation"><strong>O‘zbekcha:</strong> innovatsiya, yangilik</div>
                     <div class="vocab-definition">
                         <strong>Noun:</strong> A new method, idea, or product; the introduction of new things.
                     </div>
@@ -1158,6 +320,7 @@
                     <span class="badge badge-primary">Academic</span>
                     <div class="vocab-word">Paradigm</div>
                     <div class="vocab-pronunciation">/ˈpærədaɪm/</div>
+                    <div class="vocab-translation"><strong>O‘zbekcha:</strong> andoza, namuna, nazariy model</div>
                     <div class="vocab-definition">
                         <strong>Noun:</strong> A typical example or pattern; a worldview or model.
                     </div>
@@ -1169,6 +332,54 @@
         </div>
     </div>
 
+    <!-- English Podcasts Page -->
+    <div id="podcasts" class="page">
+        <div class="container">
+            <div class="section-header">
+                <div>
+                    <h1 class="section-title">English Podcasts</h1>
+                    <p class="section-subtitle">Practise listening with free English audio from trusted learning sources.</p>
+                </div>
+            </div>
+
+            <div class="podcast-grid">
+                <article class="podcast-card podcast-card-featured">
+                    <span class="podcast-level">Telegram · full channel</span>
+                    <h2>ENGLISH PODCASTS 🎧</h2>
+                    <p>Open the channel to browse and listen to its complete podcast collection on Telegram.</p>
+                    <a class="podcast-link" href="https://t.me/Podcast_English_listening" target="_blank" rel="noopener noreferrer">
+                        Open all podcasts in Telegram <i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i>
+                    </a>
+                </article>
+                <article class="podcast-card">
+                    <span class="podcast-level">Easy · beginner</span>
+                    <h2>BBC Real Easy English</h2>
+                    <p>Short, natural conversations with explanations of useful words and phrases.</p>
+                    <a class="podcast-link" href="https://www.bbc.co.uk/learningenglish/english/features/real-easy-english" target="_blank" rel="noopener noreferrer">
+                        Listen at BBC Learning English <i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i>
+                    </a>
+                </article>
+                <article class="podcast-card">
+                    <span class="podcast-level">Intermediate · 6 minutes</span>
+                    <h2>BBC 6 Minute English</h2>
+                    <p>Explore a new topic, practise listening, and learn key vocabulary in each episode.</p>
+                    <a class="podcast-link" href="https://www.bbc.co.uk/learningenglish/english/features/6-minute-english" target="_blank" rel="noopener noreferrer">
+                        Listen at BBC Learning English <i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i>
+                    </a>
+                </article>
+                <article class="podcast-card">
+                    <span class="podcast-level">Beginner–intermediate · news</span>
+                    <h2>VOA Learning English</h2>
+                    <p>Listen to English-learning audio and news stories, with a focus on clear, accessible speech.</p>
+                    <a class="podcast-link" href="https://learningenglish.voanews.com/z/1689" target="_blank" rel="noopener noreferrer">
+                        Explore VOA audio <i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i>
+                    </a>
+                </article>
+            </div>
+            <p class="podcast-note">Audio and episode pages are provided by their publishers and open in a new tab.</p>
+        </div>
+    </div>
+
     <!-- Mock Test Page -->
     <div id="mock-test" class="page">
         <div class="container">
@@ -1177,278 +388,15 @@
                 <p class="section-subtitle">Choose a skill and simulate the real IELTS exam</p>
             </div>
 
-            <div class="mock-tabs" role="tablist" aria-label="Mock test skills">
-                <button class="mock-tab active" data-mock="listening" type="button">
-                    <i class="fas fa-headphones"></i>Listening
-                </button>
-                <button class="mock-tab" data-mock="reading" type="button">
-                    <i class="fas fa-book-open"></i>Reading
-                </button>
-                <button class="mock-tab" data-mock="writing" type="button">
-                    <i class="fas fa-pen"></i>Writing
-                </button>
-                <button class="mock-tab" data-mock="speaking" type="button">
-                    <i class="fas fa-microphone"></i>Speaking
-                </button>
-            </div>
-
-            <div id="mock-listening" class="mock-panel active">
-                <div class="test-header">
-                    <h2>IELTS Listening Mock Test #1</h2>
-                    <p style="color: var(--text-secondary); margin-bottom: 1rem;">Academic & General Training - 30 minutes</p>
-                    <div class="test-info">
-                        <div class="test-info-item"><i class="fas fa-clock"></i><span>30 minutes</span></div>
-                        <div class="test-info-item"><i class="fas fa-question-circle"></i><span>40 questions</span></div>
-                        <div class="test-info-item"><i class="fas fa-headphones"></i><span>4 sections</span></div>
-                    </div>
-                </div>
-                <div class="question-list">
-                    <h3 style="margin-bottom: 1.5rem;">Sample Questions</h3>
-                    <div class="question-item">
-                        <div class="question-number">Question 1</div>
-                        <div class="question-text">What time does the library close on Saturdays?</div>
-                        <div class="option">A) 12:00 pm</div>
-                        <div class="option">B) 4:00 pm</div>
-                        <div class="option">C) 6:00 pm</div>
-                    </div>
-                    <div class="question-item">
-                        <div class="question-number">Question 2</div>
-                        <div class="question-text">Which item must the student bring to the interview?</div>
-                        <div class="option">A) Passport</div>
-                        <div class="option">B) Identification card</div>
-                        <div class="option">C) Driving licence</div>
-                    </div>
-                </div>
-            </div>
-
-            <div id="mock-reading" class="mock-panel">
-                <div class="test-header">
-                    <h2>IELTS Reading Mock Test #1</h2>
-                    <p style="color: var(--text-secondary); margin-bottom: 1rem;">Academic Module - 60 minutes</p>
-                    <div class="test-info">
-                        <div class="test-info-item"><i class="fas fa-clock"></i><span>60 minutes</span></div>
-                        <div class="test-info-item"><i class="fas fa-question-circle"></i><span>40 questions</span></div>
-                        <div class="test-info-item"><i class="fas fa-file-alt"></i><span>3 passages</span></div>
-                    </div>
-                </div>
-                <div class="question-list">
-                    <h3 style="margin-bottom: 1.5rem;">Sample Questions</h3>
-                    <div class="question-item">
-                        <div class="question-number">Question 1</div>
-                        <div class="question-text">The passage suggests that climate change is primarily caused by:</div>
-                        <div class="option">A) Natural weather patterns</div>
-                        <div class="option">B) Human activities and greenhouse gas emissions</div>
-                        <div class="option">C) Solar radiation changes</div>
-                        <div class="option">D) Volcanic eruptions</div>
-                    </div>
-                    <div class="question-item">
-                        <div class="question-number">Question 2</div>
-                        <div class="question-text">According to the text, renewable energy sources include:</div>
-                        <div class="option">A) Coal and oil</div>
-                        <div class="option">B) Natural gas</div>
-                        <div class="option">C) Solar and wind power</div>
-                        <div class="option">D) Nuclear energy only</div>
-                    </div>
-                </div>
-            </div>
-
-            <div id="mock-writing" class="mock-panel">
-                <div class="test-header">
-                    <h2>IELTS Writing Mock Test #1</h2>
-                    <p style="color: var(--text-secondary); margin-bottom: 1rem;">Academic Module - 60 minutes</p>
-                    <div class="test-info">
-                        <div class="test-info-item"><i class="fas fa-clock"></i><span>60 minutes</span></div>
-                        <div class="test-info-item"><i class="fas fa-pen"></i><span>2 tasks</span></div>
-                        <div class="test-info-item"><i class="fas fa-star"></i><span>400 words recommended</span></div>
-                    </div>
-                </div>
-                <div class="question-list">
-                    <div class="question-item">
-                        <div class="question-number">Writing Task 1</div>
-                        <div class="question-text">Summarise the main features of a chart showing household energy use and compare the different sources.</div>
-                        <textarea class="writing-area" aria-label="Writing Task 1 answer" placeholder="Write at least 150 words..."></textarea>
-                    </div>
-                    <div class="question-item">
-                        <div class="question-number">Writing Task 2</div>
-                        <div class="question-text">Some people believe that universities should teach practical skills, while others think academic subjects are more important. Discuss both views and give your opinion.</div>
-                        <textarea class="writing-area" aria-label="Writing Task 2 answer" placeholder="Write at least 250 words..."></textarea>
-                    </div>
-                </div>
-            </div>
-
-            <div id="mock-speaking" class="mock-panel">
-                <div class="test-header">
-                    <h2>IELTS Speaking Mock Test #1</h2>
-                    <p style="color: var(--text-secondary); margin-bottom: 1rem;">One-to-one speaking assessment - 11-14 minutes</p>
-                    <div class="test-info">
-                        <div class="test-info-item"><i class="fas fa-clock"></i><span>11-14 minutes</span></div>
-                        <div class="test-info-item"><i class="fas fa-comments"></i><span>3 parts</span></div>
-                        <div class="test-info-item"><i class="fas fa-microphone"></i><span>Speaking practice</span></div>
-                    </div>
-                </div>
-                <div class="question-list">
-                    <div class="question-item">
-                        <div class="question-number">Part 1 - Introduction</div>
-                        <div class="question-text">Do you prefer studying alone or in a group? Why?</div>
-                    </div>
-                    <div class="question-item">
-                        <div class="question-number">Part 2 - Long Turn</div>
-                        <div class="question-text">Describe an important decision you made. You should say what the decision was, why you made it, and how it affected you.</div>
-                        <textarea class="speaking-area" aria-label="Speaking practice notes" placeholder="Use this area for preparation notes (1-2 minutes)..."></textarea>
-                    </div>
-                    <div class="question-item">
-                        <div class="question-number">Part 3 - Discussion</div>
-                        <div class="question-text">How does education prepare people for challenges outside the classroom?</div>
-                    </div>
-                </div>
+            <div id="mock-library-root" aria-live="polite">
+                <div class="mock-loading">Loading all IELTS mock tests...</div>
             </div>
         </div>
     </div>
 
-    <script>
-        // Theme Management
-        function initTheme() {
-            const savedTheme = localStorage.getItem('ielts-theme') || 'light';
-            document.documentElement.setAttribute('data-theme', savedTheme);
-            updateThemeIcon(savedTheme);
-        }
-
-        function toggleTheme() {
-            const currentTheme = document.documentElement.getAttribute('data-theme');
-            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-            
-            document.documentElement.setAttribute('data-theme', newTheme);
-            localStorage.setItem('ielts-theme', newTheme);
-            updateThemeIcon(newTheme);
-        }
-
-        function updateThemeIcon(theme) {
-            const icon = document.getElementById('themeIcon');
-            icon.className = theme === 'light' ? 'fas fa-sun' : 'fas fa-moon';
-        }
-
-        // Navigation
-        function showPage(pageName) {
-            document.querySelectorAll('.page').forEach(page => {
-                page.classList.remove('active');
-            });
-            document.getElementById(pageName).classList.add('active');
-
-            document.querySelectorAll('.nav-link').forEach(link => {
-                link.classList.remove('active');
-                if (link.dataset.page === pageName) {
-                    link.classList.add('active');
-                }
-            });
-
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-            
-            if (window.innerWidth <= 768) {
-                document.getElementById('navLinks').classList.remove('active');
-            }
-
-            // Initialize chart if dashboard
-            if (pageName === 'dashboard') {
-                setTimeout(initChart, 100);
-            }
-        }
-
-        // Mobile Menu
-        function toggleMenu() {
-            document.getElementById('navLinks').classList.toggle('active');
-        }
-
-        // Nav Links Click Handler
-        document.querySelectorAll('.nav-link').forEach(link => {
-            link.addEventListener('click', function(e) {
-                e.preventDefault();
-                showPage(this.dataset.page);
-            });
-        });
-
-        document.querySelectorAll('.mock-tab').forEach(tab => {
-            tab.addEventListener('click', function() {
-                document.querySelectorAll('.mock-tab').forEach(item => item.classList.remove('active'));
-                document.querySelectorAll('.mock-panel').forEach(panel => panel.classList.remove('active'));
-                this.classList.add('active');
-                document.getElementById('mock-' + this.dataset.mock).classList.add('active');
-            });
-        });
-
-        // Chart Initialization
-        function initChart() {
-            const canvas = document.getElementById('performanceChart');
-            if (!canvas || canvas.chart) return;
-
-            const ctx = canvas.getContext('2d');
-            canvas.chart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6'],
-                    datasets: [{
-                        label: 'Overall Score',
-                        data: [6.5, 6.8, 7.0, 7.2, 7.3, 7.5],
-                        borderColor: '#3b82f6',
-                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                        tension: 0.4,
-                        fill: true
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: false
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: false,
-                            min: 5,
-                            max: 9,
-                            grid: {
-                                color: 'rgba(0, 0, 0, 0.05)'
-                            }
-                        },
-                        x: {
-                            grid: {
-                                display: false
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        // Option Selection
-        document.addEventListener('click', function(e) {
-            if (e.target.classList.contains('option')) {
-                const questionItem = e.target.closest('.question-item');
-                questionItem.querySelectorAll('.option').forEach(opt => {
-                    opt.classList.remove('selected');
-                });
-                e.target.classList.add('selected');
-            }
-        });
-
-        // Initialize on Load
-        window.addEventListener('load', function() {
-            initTheme();
-            initChart();
-        });
-
-        // Update chart colors on theme change
-        const originalToggleTheme = toggleTheme;
-        toggleTheme = function() {
-            originalToggleTheme();
-            const canvas = document.getElementById('performanceChart');
-            if (canvas && canvas.chart) {
-                canvas.chart.destroy();
-                canvas.chart = null;
-                setTimeout(initChart, 100);
-            }
-        };
-    </script>
+    <script src="mock-bank.js"></script>
+    <script src="ielts-master.js"></script>
+    <script src="vocabulary.js"></script>
+    <script src="mock-tests.js"></script>
 </body>
 </html>
